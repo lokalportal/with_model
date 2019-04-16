@@ -22,6 +22,7 @@ module WithModel
       @table_block = nil
       @table_options = {}
       @superclass = superclass
+    def initialize(name, superclass: ::WithModel.configuration.base_class)
     end
 
     def create

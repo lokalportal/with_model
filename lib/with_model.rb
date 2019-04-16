@@ -1,16 +1,25 @@
 # frozen_string_literal: true
 
+require 'with_model/configuration'
 require 'with_model/model'
 require 'with_model/model/dsl'
 require 'with_model/table'
 require 'with_model/version'
 
 module WithModel
+  def self.configuration
+    @configuration ||= Configuration.new
+  end
+
+  def self.configure
+    yield(configuration)
+  end
+
   # @param [Symbol] name The constant name to assign the model class to.
   # @param scope Passed to `before`/`after` in the test context.
   # @param options Passed to {WithModel::Model#initialize}.
   # @param block Yielded an instance of {WithModel::Model::DSL}.
-  def with_model(name, scope: nil, **options, &block)
+  def with_model(name, scope: ::WithModel.configuration.default_scope, **options, &block)
     model = Model.new name, options
     dsl = Model::DSL.new model
     dsl.instance_exec(&block) if block
