@@ -16,13 +16,13 @@ module WithModel
     # @param [Symbol] name The constant name to assign the model class to.
     # @param [Class] superclass The superclass for the created class. Should
     #   have `ActiveRecord::Base` as an ancestor.
-    def initialize(name, superclass: ActiveRecord::Base)
-      @name = name.to_sym
-      @model_block = nil
-      @table_block = nil
-      @table_options = {}
-      @superclass = superclass
-    def initialize(name, superclass: ::WithModel.configuration.base_class)
+    def initialize(name, table_name: nil, superclass: ::WithModel.configuration.base_class)
+      @name              = name.to_sym
+      @model_block       = nil
+      @table_block       = nil
+      @table_options     = {}
+      @superclass        = superclass
+      @custom_table_name = table_name
     end
 
     def create
@@ -73,8 +73,11 @@ module WithModel
     end
 
     def table_name
-      uid = "#{$PID}_#{Thread.current.object_id}"
-      "with_model_#{@name.to_s.tableize}_#{uid}"
+      @custom_table_name || "with_model_#{@name.to_s.tableize}_#{thread_uid}"
+    end
+
+    def thread_uid
+      "#{$PID}_#{Thread.current.object_id}"
     end
   end
 end
